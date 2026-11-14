@@ -6,9 +6,6 @@
   html {
     scroll-behavior: smooth;
   }
-
-  /* hugtih
-   */
   body {
     @apply antialiased text-slate-800 bg-[#F8FAFC];
   }
