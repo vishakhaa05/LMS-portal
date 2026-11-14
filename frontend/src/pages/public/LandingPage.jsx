@@ -18,7 +18,10 @@ import {
   Briefcase,
   Music,
   Camera,
-  Utensils
+  Utensils,
+  Calculator,
+  DollarSign,
+  SlidersHorizontal
 } from 'lucide-react';
 
 export const LandingPage = () => {
@@ -26,6 +29,36 @@ export const LandingPage = () => {
   const navigate = useNavigate();
   const [searchCity, setSearchCity] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+
+  // Interactive Budget Estimator State
+  const [calcType, setCalcType] = useState('Wedding');
+  const [calcGuests, setCalcGuests] = useState(120);
+  const [calcTier, setCalcTier] = useState('premium');
+
+  const tierMultipliers = {
+    standard: 1,
+    premium: 1.5,
+    luxury: 2.6,
+  };
+
+  const basePerGuest = {
+    Wedding: 140,
+    Birthday: 65,
+    Corporate: 110,
+    'Concert & Festival': 45,
+    'Photography & Film': 80,
+    'Catering & Dining': 70,
+  };
+
+  const calculatedBase = (basePerGuest[calcType] || 100) * calcGuests * (tierMultipliers[calcTier] || 1.5);
+  const totalEstimated = Math.round(calculatedBase / 100) * 100;
+
+  const costBreakdown = [
+    { label: 'Venue & Production Styling', percent: 40, amount: Math.round(totalEstimated * 0.40), color: 'bg-indigo-600' },
+    { label: 'Gourmet Catering & Mixology', percent: 35, amount: Math.round(totalEstimated * 0.35), color: 'bg-amber-500' },
+    { label: 'Cinematography & Visual Arts', percent: 15, amount: Math.round(totalEstimated * 0.15), color: 'bg-purple-600' },
+    { label: 'Live Music & DJ Entertainment', percent: 10, amount: Math.round(totalEstimated * 0.10), color: 'bg-emerald-500' },
+  ];
 
   const featuredVendors = vendors.filter((v) => v.featured || v.rating >= 4.9).slice(0, 4);
 
@@ -295,6 +328,158 @@ export const LandingPage = () => {
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 Confirm bookings with milestone escrow guarantees. Track vendor timelines in one synchronized dashboard and relish an immaculate event day.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5.5 INTERACTIVE SMART BUDGET ESTIMATOR */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-10 lg:p-12 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+            {/* Left Column: Interactive Controls */}
+            <div className="lg:col-span-7 space-y-6">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300 text-xs font-bold mb-2">
+                  <Calculator className="w-3.5 h-3.5" />
+                  <span>Real-Time Estimation Tool</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Instant Celebration Budget Estimator
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Adjust guest attendance and service tier to simulate transparent market pricing from vetted vendors.
+                </p>
+              </div>
+
+              {/* Event Type Selector */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
+                  Event Category
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {['Wedding', 'Corporate', 'Birthday', 'Concert & Festival'].map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setCalcType(type)}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                        calcType === type
+                          ? 'bg-brand-600 text-white shadow-md shadow-brand-600/25'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Guest Count Slider */}
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    Estimated Guests
+                  </label>
+                  <span className="text-base font-extrabold text-brand-700 dark:text-brand-400">
+                    {calcGuests} Attendees
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="20"
+                  max="500"
+                  step="10"
+                  value={calcGuests}
+                  onChange={(e) => setCalcGuests(Number(e.target.value))}
+                  className="w-full accent-brand-600 cursor-pointer h-2 bg-slate-200 dark:bg-slate-700 rounded-lg"
+                />
+                <div className="flex justify-between text-[11px] text-slate-400 mt-1">
+                  <span>Intimate (20)</span>
+                  <span>Grand Celebration (500)</span>
+                </div>
+              </div>
+
+              {/* Tier Selector */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">
+                  Experience Tier
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'standard', title: 'Essential', sub: 'Standard vendors' },
+                    { id: 'premium', title: 'Signature', sub: 'Top-rated artisans' },
+                    { id: 'luxury', title: 'Luxury VIP', sub: 'Full production' },
+                  ].map((tier) => (
+                    <button
+                      key={tier.id}
+                      type="button"
+                      onClick={() => setCalcTier(tier.id)}
+                      className={`p-3 rounded-2xl border text-left transition-all ${
+                        calcTier === tier.id
+                          ? 'border-brand-600 bg-brand-50/70 dark:bg-brand-950/40 ring-2 ring-brand-500/20'
+                          : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="font-bold text-xs text-slate-900 dark:text-white">
+                        {tier.title}
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{tier.sub}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Computed Estimates & Breakdown */}
+            <div className="lg:col-span-5 bg-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-800 space-y-6">
+              <div className="flex justify-between items-baseline border-b border-slate-800 pb-4">
+                <div>
+                  <span className="text-[11px] uppercase tracking-wider text-slate-400 font-bold block">
+                    Estimated Budget
+                  </span>
+                  <div className="text-3xl sm:text-4xl font-black text-amber-400 mt-1">
+                    ${totalEstimated.toLocaleString()}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs text-slate-400 block">Average</span>
+                  <span className="text-xs font-bold text-slate-200">
+                    ~${Math.round(totalEstimated / calcGuests)} / guest
+                  </span>
+                </div>
+              </div>
+
+              {/* Allocation Breakdown Progress Bars */}
+              <div className="space-y-3 text-xs">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                  Recommended Budget Allocation
+                </span>
+                {costBreakdown.map((item, idx) => (
+                  <div key={idx} className="space-y-1">
+                    <div className="flex justify-between text-slate-300 text-[11px]">
+                      <span>{item.label} ({item.percent}%)</span>
+                      <span className="font-bold">${item.amount.toLocaleString()}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${item.color} rounded-full`}
+                        style={{ width: `${item.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Link
+                to={`/customer/create-event?type=${encodeURIComponent(calcType)}&budget=${totalEstimated}&guests=${calcGuests}`}
+                className="w-full py-3 px-4 rounded-xl bg-brand-gradient hover:bg-brand-gradient-hover text-white text-xs font-bold shadow-md shadow-brand-500/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+              >
+                <span>Plan Event with this Budget</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         </div>

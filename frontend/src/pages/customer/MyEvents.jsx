@@ -15,7 +15,10 @@ import {
   CheckCircle2,
   Clock,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  ListTodo,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 
 export const MyEvents = () => {
@@ -28,6 +31,39 @@ export const MyEvents = () => {
   );
 
   const [selectedEvent, setSelectedEvent] = useState(null);
+
+  const [eventChecklists, setEventChecklists] = useState({
+    'evt-101': [
+      { id: 1, text: 'Confirm Grand Ballroom banquet buyout contract', done: true },
+      { id: 2, text: 'Lock in full-day cinematography & drone schedule', done: true },
+      { id: 3, text: 'Tasting appointment for 5-course plated dinner', done: true },
+      { id: 4, text: 'Select floral arch & table centerpieces with florist', done: false },
+      { id: 5, text: 'Send formal invitation RSVPs & dietary options', done: false },
+      { id: 6, text: 'Final balance disbursement via escrow release', done: false },
+    ],
+    'evt-102': [
+      { id: 1, text: 'Contract convention center keynote stage', done: true },
+      { id: 2, text: 'Schedule Lumina Lens multi-cam conference crew', done: true },
+      { id: 3, text: 'Select grazing station banquet menu', done: true },
+      { id: 4, text: 'Publish attendee schedule and livestream links', done: false },
+    ],
+  });
+
+  const toggleChecklistItem = (eventId, itemId) => {
+    setEventChecklists((prev) => {
+      const list = prev[eventId] || [
+        { id: 1, text: 'Reserve event venue', done: true },
+        { id: 2, text: 'Contract key vendors', done: false },
+        { id: 3, text: 'Finalize RSVP list', done: false },
+      ];
+      return {
+        ...prev,
+        [eventId]: list.map((item) =>
+          item.id === itemId ? { ...item, done: !item.done } : item
+        ),
+      };
+    });
+  };
 
   return (
     <div className="space-y-8 pb-16">
@@ -246,6 +282,61 @@ export const MyEvents = () => {
                 )}
               </div>
             </div>
+
+            {/* Planning Milestone Checklist */}
+            {(() => {
+              const currentList = eventChecklists[selectedEvent.id] || [
+                { id: 1, text: 'Confirm event venue and deposit', done: true },
+                { id: 2, text: 'Contract key service vendors', done: (selectedEvent.bookedVendors || []).length > 0 },
+                { id: 3, text: 'Send invitations & collect RSVPs', done: false },
+                { id: 4, text: 'Finalize music, entry timeline & schedule', done: false },
+              ];
+              const completedCount = currentList.filter((item) => item.done).length;
+              const percentDone = Math.round((completedCount / currentList.length) * 100);
+
+              return (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                      <ListTodo className="w-3.5 h-3.5 text-brand-600" />
+                      <span>Planning Milestones Checklist</span>
+                    </h4>
+                    <span className="text-[11px] font-bold text-brand-600 dark:text-brand-400">
+                      {completedCount} / {currentList.length} Done ({percentDone}%)
+                    </span>
+                  </div>
+
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                      style={{ width: `${percentDone}%` }}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 pt-1">
+                    {currentList.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => toggleChecklistItem(selectedEvent.id, item.id)}
+                        className={`w-full flex items-start gap-2.5 p-2.5 rounded-xl border text-left text-xs transition-all ${
+                          item.done
+                            ? 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-400 line-through'
+                            : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:border-brand-300'
+                        }`}
+                      >
+                        {item.done ? (
+                          <CheckSquare className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        ) : (
+                          <Square className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                        )}
+                        <span className="flex-1 font-medium">{item.text}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {selectedEvent.notes && (
               <div>

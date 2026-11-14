@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useData } from '../../context/DataContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -26,16 +26,21 @@ export const CreateEvent = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const queryType = searchParams.get('type') || 'Wedding';
+  const queryBudget = searchParams.get('budget') ? Number(searchParams.get('budget')) : 25000;
+  const queryGuests = searchParams.get('guests') ? Number(searchParams.get('guests')) : 150;
 
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     title: '',
-    type: 'Wedding',
+    type: queryType,
     date: '2027-02-14',
     time: '17:00',
     location: '',
-    budget: 25000,
-    guests: 150,
+    budget: queryBudget,
+    guests: queryGuests,
     notes: '',
   });
 
